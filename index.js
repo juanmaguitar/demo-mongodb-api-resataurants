@@ -1,18 +1,22 @@
 const express = require('express')
-const MongoClient = require('mongodb').MongoClient
+const mongoose = require('mongoose')
+mongoose.Promise = global.Promise
 
-const url = 'mongodb://localhost:27017/test'
-const getRoutes = require('./routes')
+const filtersApi = require('./middlewares/filters')
+
+const routesRestaurants = require('./routes/restaurants')
+const routesRestaurant = require('./routes/restaurant')
+
+const urlDb = 'mongodb://localhost:27017/test'
 
 const app = express()
 
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err
-  console.log("Connected correctly to server");
+mongoose.connect(urlDb, { useMongoClient: true })
 
-  app.use( getRoutes(db) )
+app.use(filtersApi)
 
-})
+app.use('/restaurants', routesRestaurants)
+app.use('/restaurant', routesRestaurant)
 
 app.listen(3000)
 console.log('Listening on PORT 3000...');
